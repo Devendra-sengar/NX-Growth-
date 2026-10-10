@@ -1,0 +1,54 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 500 500" width="100%" height="100%">
+  <defs>
+    <linearGradient id="nxGreenGrad" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#22c55e" />
+      <stop offset="35%" stop-color="#16a34a" />
+      <stop offset="70%" stop-color="#14532d" />
+      <stop offset="100%" stop-color="#052e16" />
+    </linearGradient>
+  </defs>
+
+  <g fill="url(#nxGreenGrad)">
+    <!-- ===== LETTER N ===== -->
+    <!-- Left Vertical 5 Lines -->
+    <rect x="40" y="115" width="9" height="270" />
+    <rect x="62" y="115" width="9" height="270" />
+    <rect x="84" y="150" width="9" height="235" />
+    <rect x="106" y="195" width="9" height="190" />
+    <rect x="128" y="240" width="9" height="145" />
+
+    <!-- N Diagonal 5 Stripes -->
+    <!-- Diagonal 1 -->
+    <polygon points="40,115 52,115 180,385 168,385" />
+    <!-- Diagonal 2 -->
+    <polygon points="62,115 74,115 202,385 190,385" />
+    <!-- Diagonal 3 -->
+    <polygon points="84,115 96,115 224,385 212,385" />
+    <!-- Diagonal 4 -->
+    <polygon points="106,115 118,115 246,385 234,385" />
+    <!-- Diagonal 5 -->
+    <polygon points="128,115 140,115 248,345 248,320" />
+
+    <!-- Right Vertical 5 Lines -->
+    <rect x="184" y="115" width="9" height="140" />
+    <rect x="202" y="115" width="9" height="185" />
+    <rect x="220" y="115" width="9" height="230" />
+    <rect x="238" y="115" width="9" height="270" />
+    <rect x="256" y="115" width="9" height="270" />
+
+    <!-- ===== LETTER X ===== -->
+    <!-- Diagonal Stroke 1: Top-Left to Bottom-Right -->
+    <polygon points="262,115 274,115 410,385 398,385" />
+    <polygon points="284,115 296,115 432,385 420,385" />
+    <polygon points="306,115 318,115 454,385 442,385" />
+    <polygon points="328,115 340,115 476,385 464,385" />
+    <polygon points="350,115 362,115 498,385 486,385" />
+
+    <!-- Diagonal Stroke 2: Top-Right to Bottom-Left -->
+    <polygon points="486,115 498,115 362,385 350,385" />
+    <polygon points="464,115 476,115 340,385 328,385" />
+    <polygon points="442,115 454,115 318,385 306,385" />
+    <polygon points="420,115 432,115 296,385 284,385" />
+    <polygon points="398,115 410,115 274,385 262,385" />
+  </g>
+</svg>
