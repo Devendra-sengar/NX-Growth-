@@ -230,25 +230,22 @@ app.get('/api/health', (_req, res) => {
 });
 
 // Setup Vite or Static File Serving
-async function startServer() {
-  if (process.env.NODE_ENV !== 'production') {
-    const vite = await createViteServer({
-      server: { middlewareMode: true },
-      appType: 'spa',
-    });
-    app.use(vite.middlewares);
-  } else {
-    const distPath = path.resolve(process.cwd(), 'dist');
-    app.use(express.static(distPath));
-    app.get('*', (_req, res) => {
-      res.sendFile(path.resolve(distPath, 'index.html'));
-    });
-  }
+function startServer() {
+const distPath = path.resolve(process.cwd(), 'dist');
 
-  app.listen(PORT, () => {
-    console.log(`🚀 NX Growth Full-Stack Server running at http://localhost:${PORT}`);
-    console.log(`📬 Nodemailer configured for leads recipient: ${RECIPIENT_EMAIL}`);
-  });
+app.use(express.static(distPath));
+
+// Keep API routes accessible; send the SPA for other GET routes.
+app.get('*', (_req, res) => {
+res.sendFile(path.join(distPath, 'index.html'));
+});
+
+app.listen(PORT, () => {
+console.log(NX Growth server running on port ${PORT});
+console.log(Lead recipient: ${RECIPIENT_EMAIL});
+});
 }
+
+
 
 startServer();
