@@ -22,7 +22,7 @@
       "handle": "filesystem"
     },
     {
-      "src": "/(.*)",
+      "src": "/((?!assets/|favicon\\.ico|.*\\.[a-zA-Z0-9]+$).*)",
       "dest": "/index.html"
     }
   ]
