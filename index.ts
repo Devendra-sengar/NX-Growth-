@@ -7,6 +7,9 @@ dotenv.config();
 
 const app = express();
 const PORT = process.env.PORT || 3000;
+const distPath = path.resolve(process.cwd(), 'dist');
+
+app.use(express.static(distPath));
 
 app.use(express.json());
 
@@ -230,10 +233,8 @@ app.get('/api/health', (_req, res) => {
 });
 
 // Setup Vite or Static File Serving
-function startServer() {
-const distPath = path.resolve(process.cwd(), 'dist');
 
-app.use(express.static(distPath));
+
 
 // Keep API routes accessible; send the SPA for other GET routes.
 app.get('*', (_req, res) => {
@@ -244,10 +245,9 @@ app.listen(PORT, () => {
 console.log(`NX Growth server running on port ${PORT}`);
 console.log(`Lead recipient: ${RECIPIENT_EMAIL}`);
 });
-}
 
 
 
-startServer();
+
 
 export default app;
