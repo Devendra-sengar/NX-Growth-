@@ -167,23 +167,45 @@ app.get('/api/health', (_req, res) => {
   });
 });
 
-// 2. Static Assets Served by Express
-const distPath = path.resolve(process.cwd(), 'dist');
+const potentialDistPaths = [
+  path.join(process.cwd(), 'dist'),
+  path.join(__dirname, '../dist'),
+  path.join(__dirname, 'dist'),
+  path.resolve('dist'),
+];
 
-// Serve all static files from dist (js, css, images, etc.)
-app.use(express.static(distPath));
+const distPath = potentialDistPaths.find((p) => fs.existsSync(p)) || path.join(process.cwd(), 'dist');
 
-// 3. Fallback Route: SPA fallback for client-side routing
-app.get('*', (_req, res) => {
-  res.sendFile(path.join(distPath, 'index.html'));
+console.log('Serving static files from:', distPath);
+
+// 1. Explicitly serve static assets
+app.use(
+  express.static(distPath, {
+    maxAge: '1d',
+    setHeaders: (res, filePath) => {
+      if (filePath.endsWith('.css')) {
+        res.setHeader('Content-Type', 'text/css');
+      } else if (filePath.endsWith('.js')) {
+        res.setHeader('Content-Type', 'application/javascript');
+      }
+    },
+  })
+);
+
+// 2. SPA Fallback - Only return index.html for non-asset routes!
+app.get('*', (req: Request, res: Response) => {
+  // If the browser asked for a static asset (.css, .js, .svg, etc.) but it wasn't found,
+  // RETURN A 404 INSTEAD OF index.html so the browser doesn't throw a MIME type error!
+  if (req.url.match(/\.(css|js|png|jpg|jpeg|gif|svg|ico|woff|woff2|ttf)$/i)) {
+    return res.status(404).send(`Asset not found at ${path.join(distPath, req.url)}`);
+  }
+
+  const indexPath = path.join(distPath, 'index.html');
+  if (fs.existsSync(indexPath)) {
+    res.sendFile(indexPath);
+  } else {
+    res.status(404).send('Build not found. Did vite build run?');
+  }
 });
-
-// Local development fallback
-if (process.env.NODE_ENV !== 'production' && !process.env.VERCEL) {
-  const PORT = process.env.PORT || 3000;
-  app.listen(PORT, () => {
-    console.log(`Server running on port ${PORT}`);
-  });
-}
 
 export default app;
