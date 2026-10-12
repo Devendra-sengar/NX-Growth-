@@ -2,7 +2,6 @@ import express, { Request, Response } from 'express';
 import nodemailer from 'nodemailer';
 import path from 'path';
 import dotenv from 'dotenv';
-import { createServer as createViteServer } from 'vite';
 
 dotenv.config();
 
