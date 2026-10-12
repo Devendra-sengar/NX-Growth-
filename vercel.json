@@ -1,29 +1,13 @@
 {
-  "version": 2,
-  "builds": [
-    {
-      "src": "package.json",
-      "use": "@vercel/static-build",
-      "config": {
-        "distDir": "dist"
-      }
-    },
-    {
-      "src": "index.ts",
-      "use": "@vercel/node"
+  "functions": {
+    "api/index.ts": {
+      "includeFiles": "dist/**"
     }
-  ],
-  "routes": [
+  },
+  "rewrites": [
     {
-      "src": "/api/(.*)",
-      "dest": "index.ts"
-    },
-    {
-      "handle": "filesystem"
-    },
-    {
-      "src": "/((?!assets/|favicon\\.ico|.*\\.[a-zA-Z0-9]+$).*)",
-      "dest": "/index.html"
+      "source": "/(.*)",
+      "destination": "/index.ts"
     }
   ]
 }
