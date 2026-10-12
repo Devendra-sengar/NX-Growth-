@@ -1,23 +1,17 @@
 import express, { Request, Response } from 'express';
 import nodemailer from 'nodemailer';
-import path from 'path'; 
+import path from 'path';
 import dotenv from 'dotenv';
 
 dotenv.config();
- 
+
 const app = express();
-const PORT = process.env.PORT || 3000;
-const distPath = path.resolve(process.cwd(), 'dist');
-
-app.use(express.static(distPath));
-
 app.use(express.json());
 
-// Target recipient email (as specified by user)
+// Target recipient email
 const DEFAULT_RECIPIENT = 'contact@nexisparkx.com';
 const RECIPIENT_EMAIL = process.env.RECIPIENT_EMAIL || DEFAULT_RECIPIENT;
 
-// Helper to initialize nodemailer transporter
 async function getTransporter() {
   if (process.env.SMTP_USER && process.env.SMTP_PASS) {
     return nodemailer.createTransport({
@@ -31,7 +25,6 @@ async function getTransporter() {
     });
   }
 
-  // Fallback test account via Ethereal for testing & preview without credentials
   try {
     const testAccount = await nodemailer.createTestAccount();
     return nodemailer.createTransport({
@@ -44,14 +37,13 @@ async function getTransporter() {
       },
     });
   } catch {
-    // Stream transporter fallback if offline
     return nodemailer.createTransport({
       jsonTransport: true,
     });
   }
 }
 
-// API endpoint for sending strategy intake lead form via Nodemailer
+// 1. API Endpoints
 app.post('/api/send-intake', async (req: Request, res: Response) => {
   try {
     const {
@@ -82,7 +74,6 @@ app.post('/api/send-intake', async (req: Request, res: Response) => {
       ? needs.join(', ')
       : needs || 'Full Ecosystem Growth Strategy';
 
-    // HTML Email Template
     const htmlEmail = `
 <!DOCTYPE html>
 <html>
@@ -116,54 +107,18 @@ app.post('/api/send-intake', async (req: Request, res: Response) => {
     <div class="content">
       <h2 class="section-title">Client Candidate Profile</h2>
       <table class="info-table">
-        <tr>
-          <td class="label">Full Name</td>
-          <td class="value"><strong>${fullName}</strong></td>
-        </tr>
-        <tr>
-          <td class="label">Company / Org</td>
-          <td class="value">${companyName || 'Not specified'}</td>
-        </tr>
-        <tr>
-          <td class="label">Corporate Email</td>
-          <td class="value"><a href="mailto:${email}" style="color: #0051d5; text-decoration: none; font-weight: 600;">${email}</a></td>
-        </tr>
-        <tr>
-          <td class="label">Phone</td>
-          <td class="value">${phone ? `<a href="tel:${phone}" style="color: #0051d5; text-decoration: none;">${phone}</a>` : 'Not provided'}</td>
-        </tr>
-        <tr>
-          <td class="label">Industry Sector</td>
-          <td class="value">${industry || 'Technology / General Enterprise'}</td>
-        </tr>
-        <tr>
-          <td class="label">Strategic Objectives</td>
-          <td class="value"><span style="color: #0051d5; font-weight: 600;">${needsList}</span></td>
-        </tr>
-        <tr>
-          <td class="label">Intake Origin / CTA</td>
-          <td class="value">${source || 'Primary CTA Button'}</td>
-        </tr>
-        <tr>
-          <td class="label">Timestamp</td>
-          <td class="value">${submissionTime} (UTC)</td>
-        </tr>
+        <tr><td class="label">Full Name</td><td class="value"><strong>${fullName}</strong></td></tr>
+        <tr><td class="label">Company / Org</td><td class="value">${companyName || 'Not specified'}</td></tr>
+        <tr><td class="label">Corporate Email</td><td class="value"><a href="mailto:${email}" style="color: #0051d5; text-decoration: none; font-weight: 600;">${email}</a></td></tr>
+        <tr><td class="label">Phone</td><td class="value">${phone ? `<a href="tel:${phone}" style="color: #0051d5; text-decoration: none;">${phone}</a>` : 'Not provided'}</td></tr>
+        <tr><td class="label">Industry Sector</td><td class="value">${industry || 'Technology / General Enterprise'}</td></tr>
+        <tr><td class="label">Strategic Objectives</td><td class="value"><span style="color: #0051d5; font-weight: 600;">${needsList}</span></td></tr>
+        <tr><td class="label">Intake Origin / CTA</td><td class="value">${source || 'Primary CTA Button'}</td></tr>
+        <tr><td class="label">Timestamp</td><td class="value">${submissionTime} (UTC)</td></tr>
       </table>
-
-      ${
-        message
-          ? `
-      <h2 class="section-title">Scale Target & Revenue Goals</h2>
-      <div class="message-box">
-        ${message.replace(/\n/g, '<br/>')}
-      </div>`
-          : ''
-      }
-
+      ${message ? `<h2 class="section-title">Scale Target & Revenue Goals</h2><div class="message-box">${message.replace(/\n/g, '<br/>')}</div>` : ''}
       <div style="text-align: center; margin-top: 20px;">
-        <a href="mailto:${email}?subject=Re:%20NX%20Growth%20Strategy%20Consultation%20for%20${encodeURIComponent(
-      companyName || fullName
-    )}" class="reply-btn">Direct Reply to ${fullName}</a>
+        <a href="mailto:${email}?subject=Re:%20NX%20Growth%20Strategy%20Consultation%20for%20${encodeURIComponent(companyName || fullName)}" class="reply-btn">Direct Reply to ${fullName}</a>
       </div>
     </div>
     <div class="footer">
@@ -189,41 +144,21 @@ app.post('/api/send-intake', async (req: Request, res: Response) => {
     const info = await transporter.sendMail(mailOptions);
     const previewUrl = nodemailer.getTestMessageUrl(info);
 
-    console.log('✅ [NODEMAILER] Email dispatched successfully!');
-    console.log('   Message ID:', info.messageId);
-    console.log('   To Recipient:', RECIPIENT_EMAIL);
-    console.log('   Lead Name:', fullName);
-    console.log('   Company:', companyName);
-    if (previewUrl) {
-      console.log('   Preview URL (Ethereal):', previewUrl);
-    }
-
     return res.status(200).json({
       success: true,
       message: `Strategic intake delivered to ${RECIPIENT_EMAIL} via Nodemailer.`,
       previewUrl: previewUrl || null,
       messageId: info.messageId,
-      data: {
-        fullName,
-        companyName,
-        email,
-        phone,
-        industry,
-        needs: needsList,
-        submittedAt: submissionTime,
-      },
     });
   } catch (err: unknown) {
     const error = err as Error;
-    console.error('❌ [NODEMAILER ERROR]:', error.message || error);
     return res.status(500).json({
       success: false,
-      error: 'Failed to dispatch email via Nodemailer: ' + (error.message || 'Unknown error'),
+      error: 'Failed to dispatch email: ' + (error.message || 'Unknown error'),
     });
   }
 });
 
-// Health check
 app.get('/api/health', (_req, res) => {
   res.json({
     status: 'ok',
@@ -232,22 +167,23 @@ app.get('/api/health', (_req, res) => {
   });
 });
 
-// Setup Vite or Static File Serving
+// 2. Static Assets Served by Express
+const distPath = path.resolve(process.cwd(), 'dist');
 
+// Serve all static files from dist (js, css, images, etc.)
+app.use(express.static(distPath));
 
-
-// Keep API routes accessible; send the SPA for other GET routes.
-app.use((_req, res) => {
-res.sendFile(path.join(distPath, 'index.html'));
+// 3. Fallback Route: SPA fallback for client-side routing
+app.get('*', (_req, res) => {
+  res.sendFile(path.join(distPath, 'index.html'));
 });
 
-app.listen(PORT, () => {
-console.log(`NX Growth server running on port ${PORT}`);
-console.log(`Lead recipient: ${RECIPIENT_EMAIL}`);
-});
-
-
-
-
+// Local development fallback
+if (process.env.NODE_ENV !== 'production' && !process.env.VERCEL) {
+  const PORT = process.env.PORT || 3000;
+  app.listen(PORT, () => {
+    console.log(`Server running on port ${PORT}`);
+  });
+}
 
 export default app;
