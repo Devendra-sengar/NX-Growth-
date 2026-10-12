@@ -241,8 +241,8 @@ res.sendFile(path.join(distPath, 'index.html'));
 });
 
 app.listen(PORT, () => {
-console.log(NX Growth server running on port ${PORT});
-console.log(Lead recipient: ${RECIPIENT_EMAIL});
+console.log(`NX Growth server running on port ${PORT}`);
+console.log(`Lead recipient: ${RECIPIENT_EMAIL}`);
 });
 }
 
