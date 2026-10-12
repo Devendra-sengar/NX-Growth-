@@ -1,6 +1,6 @@
 import express, { Request, Response } from 'express';
 import nodemailer from 'nodemailer';
-import path from 'path';
+import path from 'path'; 
 import dotenv from 'dotenv';
 
 dotenv.config();
