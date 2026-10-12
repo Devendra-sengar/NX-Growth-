@@ -4,7 +4,7 @@ import path from 'path';
 import dotenv from 'dotenv';
 
 dotenv.config();
-
+ 
 const app = express();
 const PORT = process.env.PORT || 3000;
 const distPath = path.resolve(process.cwd(), 'dist');
