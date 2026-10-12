@@ -237,7 +237,7 @@ app.get('/api/health', (_req, res) => {
 
 
 // Keep API routes accessible; send the SPA for other GET routes.
-app.get('*', (_req, res) => {
+app.use((_req, res) => {
 res.sendFile(path.join(distPath, 'index.html'));
 });
 
