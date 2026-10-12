@@ -249,3 +249,5 @@ console.log(`Lead recipient: ${RECIPIENT_EMAIL}`);
 
 
 startServer();
+
+export default app;
