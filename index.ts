@@ -2,6 +2,7 @@ import express, { Request, Response } from 'express';
 import nodemailer from 'nodemailer';
 import path from 'path';
 import dotenv from 'dotenv';
+import fs from "fs";
 
 dotenv.config();
 
