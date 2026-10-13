@@ -170,8 +170,8 @@ app.get('/api/health', (_req, res) => {
 
 const potentialDistPaths = [
   path.join(process.cwd(), 'dist'),
-  path.join(__dirname, '../dist'),
-  path.join(__dirname, 'dist'),
+  path.join(import.meta.dirname, '../dist'),
+  path.join(import.meta.dirname, 'dist'),
   path.resolve('dist'),
 ];
 
