@@ -128,7 +128,15 @@ app.post('/api/send-intake', async (req: Request, res: Response) => {
         </tr>
         <tr>
           <td class="label">Phone</td>
-          <td class="value">${phone ? <a href="tel:${phone}" style="color: #0051d5; text-decoration: none;">${phone}</a> : 'Not provided'}</td>
+         
+<td class="value">
+  ${
+    phone
+      ? `<a href="tel:${phone}" style="color: #0051d5; text-decoration: none;">${phone}</a>`
+      : 'Not provided'
+  }
+</td>
+
         </tr>
         <tr>
           <td class="label">Industry Sector</td>
