@@ -2,10 +2,10 @@ import express, { Request, Response } from 'express';
 import nodemailer from 'nodemailer';
 import path from 'path';
 import dotenv from 'dotenv';
-
+import { createServer as createViteServer } from 'vite';
 
 dotenv.config();
- 
+
 const app = express();
 const PORT = process.env.PORT || 3000;
 
@@ -128,15 +128,7 @@ app.post('/api/send-intake', async (req: Request, res: Response) => {
         </tr>
         <tr>
           <td class="label">Phone</td>
-         
-<td class="value">
-  ${
-    phone
-      ? `<a href="tel:${phone}" style="color: #0051d5; text-decoration: none;">${phone}</a>`
-      : 'Not provided'
-  }
-</td>
-
+          <td class="value">${phone ? `<a href="tel:${phone}" style="color: #0051d5; text-decoration: none;">${phone}</a>` : 'Not provided'}</td>
         </tr>
         <tr>
           <td class="label">Industry Sector</td>
@@ -184,11 +176,11 @@ app.post('/api/send-intake', async (req: Request, res: Response) => {
     const transporter = await getTransporter();
 
     const mailOptions = {
-      from: process.env.SMTP_FROM || "NX Growth Intake" <contact@nexisparkx.com>,
+      from: process.env.SMTP_FROM || `"NX Growth Intake" <contact@nexisparkx.com>`,
       to: RECIPIENT_EMAIL,
       replyTo: email,
-      subject: 🎯 New Growth Strategy Lead: ${fullName} (${companyName || 'Executive'}),
-      text: New Strategy Consultation Intake\n\nFull Name: ${fullName}\nCompany: ${companyName}\nEmail: ${email}\nPhone: ${phone}\nIndustry: ${industry}\nNeeds: ${needsList}\nSource: ${source}\n\nMessage:\n${message || 'No additional note provided'}\n\nTimestamp: ${submissionTime},
+      subject: `🎯 New Growth Strategy Lead: ${fullName} (${companyName || 'Executive'})`,
+      text: `New Strategy Consultation Intake\n\nFull Name: ${fullName}\nCompany: ${companyName}\nEmail: ${email}\nPhone: ${phone}\nIndustry: ${industry}\nNeeds: ${needsList}\nSource: ${source}\n\nMessage:\n${message || 'No additional note provided'}\n\nTimestamp: ${submissionTime}`,
       html: htmlEmail,
     };
 
@@ -206,7 +198,7 @@ app.post('/api/send-intake', async (req: Request, res: Response) => {
 
     return res.status(200).json({
       success: true,
-      message: Strategic intake delivered to ${RECIPIENT_EMAIL} via Nodemailer.,
+      message: `Strategic intake delivered to ${RECIPIENT_EMAIL} via Nodemailer.`,
       previewUrl: previewUrl || null,
       messageId: info.messageId,
       data: {
@@ -240,17 +232,23 @@ app.get('/api/health', (_req, res) => {
 
 // Setup Vite or Static File Serving
 async function startServer() {
-
+  if (process.env.NODE_ENV !== 'production') {
+    const vite = await createViteServer({
+      server: { middlewareMode: true },
+      appType: 'spa',
+    });
+    app.use(vite.middlewares);
+  } else {
     const distPath = path.resolve(process.cwd(), 'dist');
     app.use(express.static(distPath));
     app.get('*', (_req, res) => {
       res.sendFile(path.resolve(distPath, 'index.html'));
     });
-  
+  }
 
   app.listen(PORT, () => {
-    console.log(🚀 NX Growth Full-Stack Server running at http://localhost:${PORT});
-    console.log(📬 Nodemailer configured for leads recipient: ${RECIPIENT_EMAIL});
+    console.log(`🚀 NX Growth Full-Stack Server running at http://localhost:${PORT}`);
+    console.log(`📬 Nodemailer configured for leads recipient: ${RECIPIENT_EMAIL}`);
   });
 }
 
