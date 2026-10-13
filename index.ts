@@ -2,7 +2,6 @@ import express, { Request, Response } from 'express';
 import nodemailer from 'nodemailer';
 import path from 'path';
 import dotenv from 'dotenv';
-import { createServer as createViteServer } from 'vite';
 
 dotenv.config();
 
@@ -232,20 +231,13 @@ app.get('/api/health', (_req, res) => {
 
 // Setup Vite or Static File Serving
 async function startServer() {
-  if (process.env.NODE_ENV !== 'production') {
-    const vite = await createViteServer({
-      server: { middlewareMode: true },
-      appType: 'spa',
-    });
-    app.use(vite.middlewares);
-  } else {
+
     const distPath = path.resolve(process.cwd(), 'dist');
     app.use(express.static(distPath));
     app.get('*', (_req, res) => {
       res.sendFile(path.resolve(distPath, 'index.html'));
     });
-  }
-
+ 
   app.listen(PORT, () => {
     console.log(`🚀 NX Growth Full-Stack Server running at http://localhost:${PORT}`);
     console.log(`📬 Nodemailer configured for leads recipient: ${RECIPIENT_EMAIL}`);
